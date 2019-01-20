@@ -29,15 +29,13 @@ public class GameProcessor {
 		Map<Integer, Integer> chute = Board.getChute();
 		Map<Integer, Integer> ladder = Board.getLadder();
 		Scanner scanner = new Scanner(System.in);
-		do {
-
+		while (!isWinnerFound && count < exitConditionIfNoWinnerIsFound) {
 			for (int i = 0; i < players.size(); i++) {
 				Player p = players.get(i);
 				System.out.println(p.getName() + ",press " + validKey + " to roll ");
 				String input = scanner.next();
 
-				switch (input) {
-				case validKey:
+				if (input.equals(validKey)) {
 					int diceValue = rollDice();
 					count++;
 					int runningTotal = p.getRunningTotal() + diceValue;
@@ -54,7 +52,7 @@ public class GameProcessor {
 						System.out.println("Sloping down to : " + runningTotal);
 					}
 
-					if (ladder.containsKey(runningTotal)) {
+					else if (ladder.containsKey(runningTotal)) {
 						runningTotal = ladder.get(runningTotal);
 						System.out.println("Climbing the Ladder to :" + runningTotal);
 					}
@@ -68,13 +66,12 @@ public class GameProcessor {
 
 					}
 					p.setRunningTotal(runningTotal);
-					break;
-				default:
+				} else {
 					System.out.println("You miss your turn as you provided a wrong input by entering :" + input);
 				}
 
 			}
-		} while (!isWinnerFound && count < exitConditionIfNoWinnerIsFound);
+		}
 		System.out.println("Couldnt find a unanimous winner since the count for each player has exceeded "
 				+ GameConfiguration.MAXIMUM_COUNT_TO_EXIT_FROM_GAME_PER_PERSON);
 		return null;
@@ -86,7 +83,8 @@ public class GameProcessor {
 	 */
 	private int rollDice() {
 		Random r = new Random();
-		int n = r.nextInt(GameConfiguration.MAXIMUM_DICE_VALUE + 1);
-		return (n == 0 ? GameConfiguration.MINIMUM_DICE_VALUE : n);
+		int n = r.nextInt(GameConfiguration.MAXIMUM_RAND_DICE_VALUE);
+		System.out.println(n);
+		return (n == 0 ? GameConfiguration.MINIMUM_RAND_DICE_VALUE : n);
 	}
 }

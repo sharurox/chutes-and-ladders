@@ -4,7 +4,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.when;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayInputStream;
@@ -16,7 +15,6 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -36,26 +34,27 @@ public class GameProcessorTest {
 	PrintStream out = mock(PrintStream.class);
 
 	Random mockForRandom = mock(Random.class);
+	
+	List<Player> players = Stream.of(new Player("player1", 0), new Player("player2", 0))
+			.collect(Collectors.toList());
 
-	private void scannerInputs(String data) {
+	private void setUpScannerInputs(String data) {
 		System.setIn(new ByteArrayInputStream(data.getBytes()));
 		System.setOut(out);
 	}
 
 	@Test
-	public void correctInput_playerOneShouldWin() throws Exception {
+	public void allValidInputsProvided_mustNotDisplayMissedYourTurnTest() throws Exception {
 		String validInput = GameConfiguration.ONLY_VALID_KEY + "\n";
 		PowerMockito.whenNew(Random.class).withAnyArguments().thenReturn(mockForRandom);
-		List<Player> players = Stream.of(new Player("player1", 0), new Player("player2", 0))
-				.collect(Collectors.toList());
-		when(mockForRandom.nextInt(GameConfiguration.MAXIMUM_DICE_VALUE)).thenReturn(5);
+		when(mockForRandom.nextInt(GameConfiguration.MAXIMUM_RAND_DICE_VALUE)).thenReturn(5);
 		StringBuffer input = new StringBuffer();
 
 		for (int i = 0; i < 50; i++) {
 			input.append(validInput);
 		}
 
-		scannerInputs(input.toString());
+		setUpScannerInputs(input.toString());
 		Board.setChute(setUpChute());
 		Board.setLadder(setUpLadder());
 		GameProcessor processor = new GameProcessor();
@@ -69,19 +68,17 @@ public class GameProcessorTest {
 	}
 
 	@Test
-	public void wrongInputOnce_playerTwoShouldWin() throws Exception {
+	public void invalidInputProvided_mustDisplayMissedYourTurnTest() throws Exception {
 		String validInput = GameConfiguration.ONLY_VALID_KEY + "\n";
 		PowerMockito.whenNew(Random.class).withAnyArguments().thenReturn(mockForRandom);
-		List<Player> players = Stream.of(new Player("player1", 0), new Player("player2", 0))
-				.collect(Collectors.toList());
-		when(mockForRandom.nextInt(GameConfiguration.MAXIMUM_DICE_VALUE)).thenReturn(5);
+		when(mockForRandom.nextInt(GameConfiguration.MAXIMUM_RAND_DICE_VALUE)).thenReturn(5);
 		StringBuffer input = new StringBuffer("wrongInput\n");
 
 		for (int i = 0; i < 50; i++) {
 			input.append(validInput);
 		}
 
-		scannerInputs(input.toString());
+		setUpScannerInputs(input.toString());
 		Board.setChute(setUpChute());
 		Board.setLadder(setUpLadder());
 		GameProcessor processor = new GameProcessor();
@@ -95,19 +92,17 @@ public class GameProcessorTest {
 	}
 	
 	@Test
-	public void noLaddersAlongTheWay_shouldDisplayNoOneWins() throws Exception {
+	public void couldNotFindAWinnerTest() throws Exception {
 		String validInput = GameConfiguration.ONLY_VALID_KEY + "\n";
 		PowerMockito.whenNew(Random.class).withAnyArguments().thenReturn(mockForRandom);
-		List<Player> players = Stream.of(new Player("player1", 0), new Player("player2", 0))
-				.collect(Collectors.toList());
-		when(mockForRandom.nextInt(GameConfiguration.MAXIMUM_DICE_VALUE)).thenReturn(5);
+		when(mockForRandom.nextInt(GameConfiguration.MAXIMUM_RAND_DICE_VALUE)).thenReturn(5);
 		StringBuffer input = new StringBuffer();
 
 		for (int i = 0; i < 200; i++) {
 			input.append(validInput);
 		}
 
-		scannerInputs(input.toString());
+		setUpScannerInputs(input.toString());
 		Board.setChute(setUpChute());
 		Board.setLadder(new HashMap<Integer,Integer>(){{
 			put(1, 2);
@@ -123,18 +118,16 @@ public class GameProcessorTest {
 	}
 
 	@Test
-	public void laddersAndChutesAlongTheWay_playerOneShouldWin() throws Exception {
+	public void laddersAndChutesFoundAlongTheWay_mustDisplaySlopingDownAndClimbingUpTest() throws Exception {
 		String validInput = GameConfiguration.ONLY_VALID_KEY + "\n";
 		PowerMockito.whenNew(Random.class).withAnyArguments().thenReturn(mockForRandom);
-		List<Player> players = Stream.of(new Player("player1", 0), new Player("player2", 0))
-				.collect(Collectors.toList());
-		when(mockForRandom.nextInt(GameConfiguration.MAXIMUM_DICE_VALUE)).thenReturn(6);
+		when(mockForRandom.nextInt(GameConfiguration.MAXIMUM_RAND_DICE_VALUE)).thenReturn(6);
 		StringBuffer input = new StringBuffer();
 		for (int i = 0; i < 200; i++) {
 			input.append(validInput);
 		}
 
-		scannerInputs(input.toString());
+		setUpScannerInputs(input.toString());
 		Board.setChute(new HashMap<Integer,Integer>(){{
 			put(12, 5);
 		}});

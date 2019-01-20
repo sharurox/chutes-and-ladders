@@ -37,7 +37,7 @@ public class GameInitiatorTest {
 	}
 
 	@Test
-	public void gameInitiator_validNumberOfPlayes_shouldCongratulate() throws Exception {
+	public void validNumberOfPlayes_shouldCongratulateTest() throws Exception {
 		
         PowerMockito.whenNew(GameProcessor.class)
             .withAnyArguments().thenReturn(gameProcessor);
@@ -54,7 +54,7 @@ public class GameInitiatorTest {
 	}
 	
 	@Test
-	public void gameInitiator_validNumberOfPlayes_noWinnerFound() throws Exception {
+	public void validNumberOfPlayes_noWinnerFoundTest() throws Exception {
 		
         PowerMockito.whenNew(GameProcessor.class)
             .withAnyArguments().thenReturn(gameProcessor);
@@ -70,7 +70,7 @@ public class GameInitiatorTest {
 	}
 	
 	@Test
-	public void gameInitiator_lessThanValidNumberOfPlayers_shouldTerminate() {
+	public void lessThanValidNumberOfPlayers_shouldTerminateTest() {
 		StringBuffer input = new StringBuffer("1\n").append("poorni\n").append("sharu");
 		provideInput(input.toString());
 		GameInitiator.main(null);
@@ -81,7 +81,7 @@ public class GameInitiatorTest {
 	}
 	
 	@Test
-	public void gameInitiator_moreThanValidNumberOfPlayers_shouldTerminate() {
+	public void moreThanValidNumberOfPlayers_shouldTerminateTest() {
 		StringBuffer input = new StringBuffer("5\n");
 		provideInput(input.toString());
 		GameInitiator.main(null);
@@ -93,7 +93,7 @@ public class GameInitiatorTest {
 	}
 	
 	@Test
-	public void gameInitiator_invalidKeyPress_shouldTerminate() {
+	public void invalidKeyPress_shouldTerminateTest() {
 		StringBuffer input = new StringBuffer("someinvalidinput\n");
 		provideInput(input.toString());
 		GameInitiator.main(null);
