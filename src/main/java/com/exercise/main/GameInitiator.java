@@ -15,7 +15,7 @@ import com.exercise.models.Result;
  * This class initiates the game.
  * Set up Chutes and Ladders on the board.
  * Set up Players.
- * Terminate if Number of player < 2 or greater than 4
+ * Terminate if 2 < Number of players < 4
  */
 public class GameInitiator {
 

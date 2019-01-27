@@ -11,11 +11,13 @@ import com.exercise.models.Player;
 import com.exercise.models.Result;
 
 /**
- * This Class is responsible for playing the game. You miss a chance if you do
- * not roll the configurable 'validKey'. You roll over configurable
- * 'Winning_point',you don't move. Game exits if player reaches the
- * 'Winning_Point'. Game also exits if no winner is found after the maximum
- * count per player is reached(config based).
+ * This Class is responsible for playing the game. 
+ * RULES:
+ * A)You miss a chance if you do not roll the configurable 'validKey'. 
+ * B)You roll over configurable 'Winning_point',you don't move. 
+ * C)Game exitS if player reaches the 'Winning_Point'.
+ * D)Game also exits if no winner is found after the maximum number of dice rolls
+  for a player is reached(config based).
  */
 public class GameProcessor {
 

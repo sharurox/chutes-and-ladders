@@ -4,6 +4,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.when;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayInputStream;
@@ -168,6 +169,41 @@ public class GameProcessorTest {
 		verify(out, times(1)).println("Climbing the Ladder to :100");
 		verify(out).println("Winner is :player1");
 		assertEquals(new Result(new Player("player1",100)), result);
+	}
+	
+	/**
+	 * This test validates that when the players have rolled over the winning point,
+	 * they don't move
+	 * @throws Exception
+	 */
+	@Test
+	public void rollOverMoreThanHundred_playerDoesNotMoveTest() throws Exception {
+
+		String validInput = GameConfiguration.ONLY_VALID_KEY + "\n";
+		PowerMockito.whenNew(Random.class).withAnyArguments().thenReturn(mockForRandom);
+		when(mockForRandom.nextInt(GameConfiguration.MAXIMUM_RAND_DICE_VALUE)).thenReturn(6);
+		StringBuffer input = new StringBuffer();
+		for (int i = 0; i < 200; i++) {
+			input.append(validInput);
+		}
+
+		setUpScannerInputs(input.toString());
+		Board.setChute(new HashMap<Integer,Integer>(){{
+			put(13, 5);
+		}});
+		Board.setLadder(new HashMap<Integer,Integer>(){{
+			put(12, 98);
+		}});
+		GameProcessor processor = new GameProcessor();
+		Result result = processor.process(players);
+		verify(out, times(0)).println("You miss your turn as you provided a wrong input by entering :wrongInput");
+		verify(out, times(0)).println("Sloping down to : 5");
+		verify(out, times(2)).println("Climbing the Ladder to :98");
+		verify(out, atLeastOnce()).println("You rolled 6 and sum is greater than 100 "
+				+ "and hence cannot be counted.Roll next time");
+		assertEquals(null, result);
+		assertEquals(98, players.get(0).getRunningTotal());
+		assertEquals(98, players.get(1).getRunningTotal());
 	}
 	
 	private static Map<Integer, Integer> setUpChute() {
