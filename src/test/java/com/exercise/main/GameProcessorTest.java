@@ -27,6 +27,10 @@ import com.exercise.models.Board;
 import com.exercise.models.Player;
 import com.exercise.models.Result;
 
+/**
+ * Test for GameProcessor.java
+ *
+ */
 @PrepareForTest(GameProcessor.class)
 @RunWith(PowerMockRunner.class)
 public class GameProcessorTest {
@@ -42,14 +46,18 @@ public class GameProcessorTest {
 		System.setIn(new ByteArrayInputStream(data.getBytes()));
 		System.setOut(out);
 	}
-
+	
+	/**
+	 * This test validates that when players correctly roll the dice,no one misses turn.
+	 * @throws Exception
+	 */
 	@Test
-	public void allValidInputsProvided_mustNotDisplayMissedYourTurnTest() throws Exception {
+	public void correctlyRollDice_noOneMissesTurnTest() throws Exception {
 		String validInput = GameConfiguration.ONLY_VALID_KEY + "\n";
 		PowerMockito.whenNew(Random.class).withAnyArguments().thenReturn(mockForRandom);
 		when(mockForRandom.nextInt(GameConfiguration.MAXIMUM_RAND_DICE_VALUE)).thenReturn(5);
 		StringBuffer input = new StringBuffer();
-
+		// add all valid inputs
 		for (int i = 0; i < 50; i++) {
 			input.append(validInput);
 		}
@@ -59,7 +67,8 @@ public class GameProcessorTest {
 		Board.setLadder(setUpLadder());
 		GameProcessor processor = new GameProcessor();
 		Result result = processor.process(players);
-		verify(out, times(0)).println("You miss your turn as you provided a wrong input by entering :wrongInput");
+		verify(out, times(0)).println("You miss your turn as you provided"
+				+ " a wrong input by entering :wrongInput");
 		verify(out, times(16)).println("player1,press r to roll ");
 		verify(out, times(15)).println("player2,press r to roll ");
 		verify(out, times(1)).println("Climbing the Ladder to :100");
@@ -67,13 +76,17 @@ public class GameProcessorTest {
 		assertEquals(new Player("player1",100),result.getWinner());
 	}
 
+	/**
+	 * This test validates that when a player in-correctly rolls the dice,he misses the turn.
+	 * @throws Exception
+	 */
 	@Test
-	public void invalidInputProvided_mustDisplayMissedYourTurnTest() throws Exception {
+	public void wronglyRollDice_shouldMissTurnTest() throws Exception {
 		String validInput = GameConfiguration.ONLY_VALID_KEY + "\n";
 		PowerMockito.whenNew(Random.class).withAnyArguments().thenReturn(mockForRandom);
 		when(mockForRandom.nextInt(GameConfiguration.MAXIMUM_RAND_DICE_VALUE)).thenReturn(5);
+		// add a wrong output followed by all valid inputs
 		StringBuffer input = new StringBuffer("wrongInput\n");
-
 		for (int i = 0; i < 50; i++) {
 			input.append(validInput);
 		}
@@ -83,7 +96,8 @@ public class GameProcessorTest {
 		Board.setLadder(setUpLadder());
 		GameProcessor processor = new GameProcessor();
 		Result result = processor.process(players);
-		verify(out, times(1)).println("You miss your turn as you provided a wrong input by entering :wrongInput");
+		verify(out, times(1)).println("You miss your turn as you provided a "
+				+ "wrong input by entering :wrongInput");
 		verify(out, times(16)).println("player1,press r to roll ");
 		verify(out, times(16)).println("player2,press r to roll ");
 		verify(out, times(1)).println("Climbing the Ladder to :100");
@@ -91,8 +105,13 @@ public class GameProcessorTest {
 		assertEquals(new Player("player2", 100),result.getWinner());
 	}
 	
+	/**
+	 * This test validates that when the players have exhausted their maximum key presses
+	 *  ,no winner is found.
+	 * @throws Exception
+	 */
 	@Test
-	public void couldNotFindAWinnerTest() throws Exception {
+	public void exhaustMaximumDiceRolls_couldNotFindAWinnerTest() throws Exception {
 		String validInput = GameConfiguration.ONLY_VALID_KEY + "\n";
 		PowerMockito.whenNew(Random.class).withAnyArguments().thenReturn(mockForRandom);
 		when(mockForRandom.nextInt(GameConfiguration.MAXIMUM_RAND_DICE_VALUE)).thenReturn(5);
@@ -109,7 +128,8 @@ public class GameProcessorTest {
 		}});
 		GameProcessor processor = new GameProcessor();
 		Result result = processor.process(players);
-		verify(out, times(0)).println("You miss your turn as you provided a wrong input by entering :wrongInput");
+		verify(out, times(0)).println("You miss your turn as you provided "
+				+ "a wrong input by entering :wrongInput");
 		verify(out, times(50)).println("player1,press r to roll ");
 		verify(out, times(50)).println("player2,press r to roll ");
 		verify(out, times(0)).println("Climbing the Ladder to :100");
@@ -117,6 +137,11 @@ public class GameProcessorTest {
 		assertEquals(null, result);
 	}
 
+	/**
+	 * This test validates that when the players come across ladders,they are climbing up 
+	 * and when they come across chutes,they are sloping down.
+	 * @throws Exception
+	 */
 	@Test
 	public void laddersAndChutesFoundAlongTheWay_mustDisplaySlopingDownAndClimbingUpTest() throws Exception {
 		String validInput = GameConfiguration.ONLY_VALID_KEY + "\n";
@@ -144,6 +169,7 @@ public class GameProcessorTest {
 		verify(out).println("Winner is :player1");
 		assertEquals(new Result(new Player("player1",100)), result);
 	}
+	
 	private static Map<Integer, Integer> setUpChute() {
 		Map<Integer, Integer> chute = new HashMap();
 		chute.put(16, 6);

@@ -23,6 +23,10 @@ import com.exercise.models.Player;
 import com.exercise.models.Result;
 
 
+/**
+ * Test for GameInitiator.java
+ *
+ */
 @PrepareForTest(GameInitiator.class)
 @RunWith(PowerMockRunner.class)
 public class GameInitiatorTest {
@@ -31,48 +35,56 @@ public class GameInitiatorTest {
 	
 	GameProcessor gameProcessor = mock(GameProcessor.class);
     
-	private void provideInput(String data) {
+	private void setUpScannerInputs(String data) {
 		System.setIn(new ByteArrayInputStream(data.getBytes()));
 		System.setOut(out);
 	}
 
+	
+	/**
+	 * This test validates that when a player wins,congratulations is displayed
+	 * @throws Exception
+	 */
 	@Test
-	public void validNumberOfPlayes_shouldCongratulateTest() throws Exception {
-		
+	public void winnerFound_shouldCongratulateTest() throws Exception {
         PowerMockito.whenNew(GameProcessor.class)
             .withAnyArguments().thenReturn(gameProcessor);
 
-		StringBuffer input = new StringBuffer("2\n").append("poorni\n").append("sharu");
-		provideInput(input.toString());
-		when(gameProcessor.process(Mockito.anyList())).thenReturn(new Result(new Player("poorni",100)));
+		StringBuffer input = new StringBuffer("2\n").append("player1\n").append("player2");
+		setUpScannerInputs(input.toString());
+		when(gameProcessor.process(Mockito.anyList())).thenReturn(new Result(new Player("player1",100)));
 		GameInitiator.main(null);
-		verify(out).println("Congratulations, poorni");
+		verify(out).println("Congratulations, player1");
 		assertTrue(Board.getChute().equals(getExpectedChutes()));
 		assertTrue(Board.getLadder().equals(getExpectedLadders()));
-		
-		
 	}
 	
+	/**
+	 * This test validates that when a winner is not found(Timed out),'coudnt find a winner'
+	 *  msg is displayed
+	 * @throws Exception
+	 */
 	@Test
-	public void validNumberOfPlayes_noWinnerFoundTest() throws Exception {
-		
+	public void noWinnerFound_shouldDisplayCouldntFindWinnerTest() throws Exception {
         PowerMockito.whenNew(GameProcessor.class)
             .withAnyArguments().thenReturn(gameProcessor);
 
-		StringBuffer input = new StringBuffer("2\n").append("poorni\n").append("sharu");
-		provideInput(input.toString());
+		StringBuffer input = new StringBuffer("2\n").append("player1\n").append("player2");
+		setUpScannerInputs(input.toString());
 		when(gameProcessor.process(Mockito.anyList())).thenReturn(null);
 		GameInitiator.main(null);
 		verify(out).println("Bad luck, we could'nt find a winner as the amount of tries has lapsed.");
 		assertTrue(Board.getChute().equals(getExpectedChutes()));
 		assertTrue(Board.getLadder().equals(getExpectedLadders()));
-		
 	}
 	
+	/**
+	 * This test validates that when < 4 number of players are entered,the program is terminated.
+	 */
 	@Test
 	public void lessThanValidNumberOfPlayers_shouldTerminateTest() {
-		StringBuffer input = new StringBuffer("1\n").append("poorni\n").append("sharu");
-		provideInput(input.toString());
+		StringBuffer input = new StringBuffer("1\n").append("player1\n").append("player2");
+		setUpScannerInputs(input.toString());
 		GameInitiator.main(null);
 		verify(out).println("Terminating! The number of players playing must be >2 and <4");
 		verify(gameProcessor,never()).process(Mockito.anyList());
@@ -80,28 +92,32 @@ public class GameInitiatorTest {
 		assertTrue(Board.getLadder().equals(getExpectedLadders()));
 	}
 	
+	/**
+	 * This test validates that when > 4 number of players are entered,the program is terminated.
+	 */
 	@Test
 	public void moreThanValidNumberOfPlayers_shouldTerminateTest() {
 		StringBuffer input = new StringBuffer("5\n");
-		provideInput(input.toString());
+		setUpScannerInputs(input.toString());
 		GameInitiator.main(null);
 		verify(out).println("Terminating! The number of players playing must be >2 and <4");
 		verify(gameProcessor,never()).process(Mockito.anyList());
 		assertTrue(Board.getChute().equals(getExpectedChutes()));
 		assertTrue(Board.getLadder().equals(getExpectedLadders()));
-		
 	}
 	
+	/**
+	 * This test validates that when an invalid character is entered instead of a Integer,the program is terminated.
+	 */
 	@Test
-	public void invalidKeyPress_shouldTerminateTest() {
+	public void invalidIntegerInput_shouldTerminateTest() {
 		StringBuffer input = new StringBuffer("someinvalidinput\n");
-		provideInput(input.toString());
+		setUpScannerInputs(input.toString());
 		GameInitiator.main(null);
 		verify(out).println("Terminating! Please enter a valid Integer. Try running again");
 		verify(gameProcessor,never()).process(Mockito.anyList());
 		assertTrue(Board.getChute().equals(getExpectedChutes()));
 		assertTrue(Board.getLadder().equals(getExpectedLadders()));
-		
 	}
 	
 	private static Map<Integer, Integer> getExpectedChutes() {
